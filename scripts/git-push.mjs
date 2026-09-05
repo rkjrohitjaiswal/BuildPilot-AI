@@ -49,9 +49,9 @@ function run(cmd, options = {}) {
 }
 
 function runInteractive(cmd, args, options = {}) {
-  // Use shell: true only for npm commands on Windows, but direct execution for git commands to preserve quoted string arguments
-  const useShell = cmd === 'npm' && process.platform === 'win32';
-  const result = spawnSync(cmd, args, { stdio: 'inherit', shell: useShell, ...options });
+  // On Windows, .cmd batch scripts like npm require shell: true; git binary runs directly
+  const isNpmOnWin = process.platform === 'win32' && (cmd === 'npm' || cmd === 'npx');
+  const result = spawnSync(cmd, args, { stdio: 'inherit', shell: isNpmOnWin, ...options });
   if (result.status !== 0) {
     throw new Error(`Command "${cmd} ${args.join(' ')}" failed with exit code ${result.status}`);
   }
